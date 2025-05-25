@@ -48,3 +48,10 @@ def predict(data: PredictRequest, okasuke587694: str = Security(get_api_key)):
     df = pd.DataFrame([data.features])
     pred = model.predict(df)[0]
     return {"prediction": pred}
+
+@app.get("/features")
+def get_features():
+    import json
+    with open("features.json", "r") as f:
+        data = json.load(f)
+    return data
