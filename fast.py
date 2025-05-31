@@ -44,7 +44,7 @@ def warm():
 
 # --- 予測エンドポイント（APIキー認証付き） ---
 @app.get("/predict", response_model=PredictResponse)
-def predict(data: PredictRequest, okasuke587694: str = Security(get_api_key)):
+def predict(okasuke587694: str = Security(get_api_key)):
     import yfinance as yf
     import pandas as pd
     from ta.trend import EMAIndicator, SMAIndicator, MACD, ADXIndicator
