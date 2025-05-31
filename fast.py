@@ -14,7 +14,7 @@ import joblib
 app = FastAPI()
 
 # --- APIキー認証用設定 ---
-API_KEY = "your_secret_api_key_here"  # 任意の秘密キーに置き換えてください
+API_KEY = "okasuke587694"  # 任意の秘密キーに置き換えてください
 API_KEY_NAME = "access_token"
 api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
 
