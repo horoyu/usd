@@ -43,15 +43,60 @@ def warm():
 
 
 # --- 予測エンドポイント（APIキー認証付き） ---
-@app.post("/predict", response_model=PredictResponse)
+@app.get("/predict", response_model=PredictResponse)
 def predict(data: PredictRequest, okasuke587694: str = Security(get_api_key)):
-    df = pd.DataFrame([data.features])
-    pred = model.predict(df)[0]
+    import yfinance as yf
+    import pandas as pd
+    from ta.trend import EMAIndicator, SMAIndicator, MACD, ADXIndicator
+    from ta.momentum import RSIIndicator, ROCIndicator, StochasticOscillator
+    from ta.volatility import AverageTrueRange, BollingerBands
+    from datetime import datetime
+    # 1. データ取得（直近60営業日程度を取得）
+    df = yf.download("JPY=X", period="3mo")  # 必要最低限の期間
+
+    # 2. テクニカル指標計算
+    close = df['Close']
+    high = df['High']
+    low = df['Low']
+    open_ = df['Open']
+
+    df['ema_10'] = EMAIndicator(close=close, window=10).ema_indicator()
+    df['ema_50'] = EMAIndicator(close=close, window=50).ema_indicator()
+    df['sma_20'] = SMAIndicator(close=close, window=20).sma_indicator()
+    macd = MACD(close=close)
+    df['macd'] = macd.macd()
+    df['macd_signal'] = macd.macd_signal()
+    df['adx'] = ADXIndicator(high=high, low=low, close=close, window=14).adx()
+    df['rsi'] = RSIIndicator(close=close, window=14).rsi()
+    df['roc'] = ROCIndicator(close=close, window=12).roc()
+    stoch = StochasticOscillator(high=high, low=low, close=close)
+    df['stoch_k'] = stoch.stoch()
+    df['stoch_d'] = stoch.stoch_signal()
+    df['atr'] = AverageTrueRange(high=high, low=low, close=close).average_true_range()
+    bb = BollingerBands(close=close)
+    df['bb_bbm'] = bb.bollinger_mavg()
+    df['bb_bbh'] = bb.bollinger_hband()
+    df['bb_bbl'] = bb.bollinger_lband()
+    df['bb_width'] = df['bb_bbh'] - df['bb_bbl']
+
+    # 3. ローソク足統計
+    df['body'] = close - open_
+    df['upper_shadow'] = high - df[['Close', 'Open']].max(axis=1)
+    df['lower_shadow'] = df[['Close', 'Open']].min(axis=1) - low
+    df['price_change_pct'] = close.pct_change() * 100
+
+    # 4. 欠損除去
+    df.dropna(inplace=True)
+
+    # 5. 最新の1件だけをfeaturesに
+    latest_features = df.iloc[[-1]].copy()  # DataFrame形式で1行保持
+    
+    #df = pd.DataFrame([data.features])
+    
+    pred = model.predict(latest_features)[0]
     return {"prediction": pred}
 
-@app.get("/features")
-def get_features():
-    import json
-    with open("features.json", "r") as f:
-        data = json.load(f)
-    return data
+
+
+
+

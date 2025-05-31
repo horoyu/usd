@@ -18,7 +18,7 @@ from sklearn.metrics import accuracy_score, classification_report
 from datetime import datetime
 
 # 1. データ取得
-df = yf.download("JPY=X", start="2005-01-01", end=datetime.today().strftime('%Y-%m-%d'))
+df = yf.download("JPY=X", start="2005-01-01", end="2025-5-30")
 
 # 2. テクニカル指標追加
 close = df[['Close']].squeeze()
