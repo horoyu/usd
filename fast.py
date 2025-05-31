@@ -55,10 +55,10 @@ def predict(okasuke587694: str = Security(get_api_key)):
     df = yf.download("JPY=X", period="3mo")  # 必要最低限の期間
 
     # 2. テクニカル指標計算
-    close = df['Close']
-    high = df['High']
-    low = df['Low']
-    open_ = df['Open']
+    close = df[['Close']].squeeze()
+    high = df[['High']].squeeze()
+    low = df[['Low']].squeeze()
+    open_ = df[['Open']].squeeze()
 
     df['ema_10'] = EMAIndicator(close=close, window=10).ema_indicator()
     df['ema_50'] = EMAIndicator(close=close, window=50).ema_indicator()
@@ -89,7 +89,8 @@ def predict(okasuke587694: str = Security(get_api_key)):
     df.dropna(inplace=True)
 
     # 5. 最新の1件だけをfeaturesに
-    latest_features = df.iloc[[-1]].copy()  # DataFrame形式で1行保持
+    latest_features = df.iloc[[-1]].copy()# DataFrame形式で1行保持
+
     
     #df = pd.DataFrame([data.features])
     
