@@ -27,9 +27,6 @@ def get_api_key(api_key_header: str = Security(api_key_header)):
             detail="Could not validate API KEY"
         )
 
-# --- モデルロード ---
-model = joblib.load('usdjpy_model.pkl')
-
 # --- 入力・出力スキーマ ---
 class PredictRequest(BaseModel):
     features: list[float]  # 25個の特徴量を想定
