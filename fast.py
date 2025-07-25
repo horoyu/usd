@@ -113,6 +113,8 @@ def predict(okasuke587694: str = Security(get_api_key)):
     pytrends.build_payload(["USDJPY"], timeframe=f"{start} {end}")
     df["trend"] = pytrends.interest_over_time()["USDJPY"].resample("D").ffill()
     
+# 5. 最新の1件だけをfeaturesに
+    latest_features = df.iloc[[-1]].copy()# DataFrame形式で1行保持
     
     # 4. ターゲット（翌日上昇なら1）
     df['target'] = (close.shift(-1) > close).astype(int)
@@ -139,9 +141,6 @@ def predict(okasuke587694: str = Security(get_api_key)):
     print(f"Accuracy: {acc:.4f}")
     print("Classification Report:")
     print(classification_report(y_test, y_pred))
-
-    # 5. 最新の1件だけをfeaturesに
-    latest_features = df.iloc[[-1]].copy()# DataFrame形式で1行保持
     
     #df = pd.DataFrame([data.features])
     
