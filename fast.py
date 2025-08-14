@@ -55,7 +55,7 @@ def predict(okasuke587694: str = Security(get_api_key)):
     from pytrends.request import TrendReq
     
     
-    start = "2024-01-01"
+    start = "2020-01-01"
     end = date.today()
     
     # 1. データ取得
@@ -146,4 +146,5 @@ def predict(okasuke587694: str = Security(get_api_key)):
     
     pred = model.predict(latest_features)[0]
     return {"prediction": pred}
+
 
